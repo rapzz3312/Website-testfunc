@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WA Function Tester</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background: #0a0e17;
+            color: #e2e8f0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: #1a2332;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #2f3d58;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #25D366;
+        }
+
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 14px;
+            background: #1e293b;
+            border: 1px solid #2f3d58;
+        }
+
+        .status-badge.connected {
+            background: #075e54;
+            color: #25D366;
+            border-color: #25D366;
+        }
+
+        .panel {
+            background: #1a2332;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #2f3d58;
+        }
+
+        .panel-title {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 15px;
+            color: #b7c9e8;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-label {
+            font-size: 14px;
+            color: #8fa1c0;
+            margin-bottom: 5px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            background: #0f1420;
+            border: 1px solid #2f3d58;
+            border-radius: 8px;
+            color: #e2e8f0;
+            font-size: 14px;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #25D366;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-primary {
+            background: #25D366;
+            color: #0f1420;
+        }
+
+        .btn-primary:hover {
+            background: #20b859;
+        }
+
+        .btn-danger {
+            background: #4a1e2c;
+            color: #fecaca;
+            border: 1px solid #b91c1c;
+        }
+
+        .btn-success {
+            background: #075e54;
+            color: white;
+        }
+
+        .pairing-code {
+            background: #0f1420;
+            border: 2px dashed #25D366;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            margin: 20px 0;
+            font-size: 32px;
+            font-weight: bold;
+            letter-spacing: 8px;
+            color: #25D366;
+            font-family: monospace;
+        }
+
+        .function-area {
+            background: #0f1420;
+            border: 1px solid #2f3d58;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #b7c9e8;
+            min-height: 200px;
+            outline: none;
+            white-space: pre-wrap;
+        }
+
+        .results-area {
+            background: #0f1420;
+            border-radius: 8px;
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+
+        .result-item {
+            padding: 8px;
+            border-bottom: 1px solid #2f3d58;
+        }
+
+        .result-item.success {
+            color: #6ee7b7;
+        }
+
+        .result-item.error {
+            color: #f87171;
+        }
+
+        .flex-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mb-2 {
+            margin-bottom: 10px;
+        }
+
+        .mt-2 {
+            margin-top: 10px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .device-info {
+            background: #0f1420;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #2f3d58;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="title">WA Function Tester</div>
+            <div class="status-badge" id="connectionBadge">📴 Offline</div>
+        </div>
+
+        <!-- Pairing Panel -->
+        <div class="panel">
+            <div class="panel-title">🔐 WhatsApp Pairing</div>
+            
+            <!-- Input Nomor -->
+            <div id="inputSection">
+                <div class="input-group">
+                    <div class="input-label">Nomor WhatsApp (628xxx)</div>
+                    <div class="flex-row">
+                        <input type="text" class="input-field" id="phoneNumber" value="6281234567890" placeholder="6281234567890">
+                        <button class="btn btn-primary" onclick="requestPairing()">Minta Kode</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pairing Code -->
+            <div id="codeSection" class="hidden">
+                <div class="pairing-code" id="pairingCodeDisplay">ABCD-EFGH-IJKL</div>
+                <div class="text-center">
+                    <button class="btn btn-success" onclick="copyCode()">📋 Salin Kode</button>
+                </div>
+                <div class="device-info">
+                    <div class="info-row">
+                        <span>Langkah pairing:</span>
+                        <span>1. Buka WhatsApp</span>
+                    </div>
+                    <div class="info-row">
+                        <span></span>
+                        <span>2. Tap 3 titik > Perangkat tertaut</span>
+                    </div>
+                    <div class="info-row">
+                        <span></span>
+                        <span>3. Pilih "Pairing code"</span>
+                    </div>
+                    <div class="info-row">
+                        <span></span>
+                        <span>4. Masukkan kode di atas</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Connected -->
+            <div id="connectedSection" class="hidden">
+                <div class="device-info">
+                    <div class="info-row">
+                        <span>Status</span>
+                        <span class="text-green">✅ Connected</span>
+                    </div>
+                    <div class="info-row">
+                        <span>Nomor</span>
+                        <span id="connectedPhone">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span>Device</span>
+                        <span id="connectedDevice">WhatsApp Web</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Function Panel -->
+        <div class="panel">
+            <div class="panel-title">📝 Function Code</div>
+            <div class="function-area" id="functionCode" contenteditable="true">async function sendMessage(sock, target) {
+    // Contoh: Kirim pesan teks
+    const result = await sock.sendText(target, "Halo dari WA Tester!");
+    return {
+        success: true,
+        message: "Pesan terkirim",
+        id: result.id
+    };
+}</div>
+        </div>
+
+        <!-- Test Panel -->
+        <div class="panel">
+            <div class="panel-title">🧪 Test Configuration</div>
+            
+            <div class="input-group">
+                <div class="input-label">Nomor Target</div>
+                <input type="text" class="input-field" id="targetNumber" value="6281234567890" placeholder="628xxx">
+            </div>
+
+            <div class="grid-2">
+                <div class="input-group">
+                    <div class="input-label">Loop</div>
+                    <input type="number" class="input-field" id="loopCount" value="1" min="1" max="100">
+                </div>
+                <div class="input-group">
+                    <div class="input-label">Delay (ms)</div>
+                    <input type="number" class="input-field" id="delay" value="1000" min="500" max="5000">
+                </div>
+            </div>
+
+            <div class="flex-row">
+                <button class="btn btn-primary" onclick="runTest()" id="runBtn" disabled>🚀 Jalankan Test</button>
+                <button class="btn btn-danger" onclick="stopTest()">⏹ Stop</button>
+                <button class="btn" onclick="clearResults()">🗑 Clear</button>
+            </div>
+        </div>
+
+        <!-- Results -->
+        <div class="panel">
+            <div class="panel-title">📋 Results</div>
+            <div class="results-area" id="results"></div>
+            
+            <div class="grid-2 mt-2">
+                <div class="input-field text-center" style="background: #0f1420;">
+                    Success: <span id="successCount">0</span>
+                </div>
+                <div class="input-field text-center" style="background: #0f1420;">
+                    Failed: <span id="failedCount">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Socket.IO -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        // Socket connection
+        const socket = io();
+        const socketId = Math.random().toString(36).substring(7);
+        
+        // State
+        let isRunning = false;
+        let stopRequested = false;
+        let currentPhone = '';
+        let successCount = 0;
+        let failCount = 0;
+
+        // Elements
+        const connectionBadge = document.getElementById('connectionBadge');
+        const inputSection = document.getElementById('inputSection');
+        const codeSection = document.getElementById('codeSection');
+        const connectedSection = document.getElementById('connectedSection');
+        const pairingCodeDisplay = document.getElementById('pairingCodeDisplay');
+        const connectedPhone = document.getElementById('connectedPhone');
+        const runBtn = document.getElementById('runBtn');
+        const results = document.getElementById('results');
+        const successSpan = document.getElementById('successCount');
+        const failedSpan = document.getElementById('failedCount');
+        const functionCode = document.getElementById('functionCode');
+
+        // Socket events
+        socket.on('connect', () => {
+            addResult('🔌 Terhubung ke server', 'info');
+        });
+
+        socket.on('pairing_code', (data) => {
+            pairingCodeDisplay.textContent = data.code;
+            inputSection.classList.add('hidden');
+            codeSection.classList.remove('hidden');
+            addResult(`🔐 Kode pairing: ${data.code}`, 'success');
+        });
+
+        socket.on('status', (data) => {
+            if (data.status === 'connected') {
+                connectionBadge.textContent = '✅ Online';
+                connectionBadge.classList.add('connected');
+                
+                codeSection.classList.add('hidden');
+                connectedSection.classList.remove('hidden');
+                
+                if (data.deviceInfo) {
+                    connectedPhone.textContent = data.deviceInfo.phone;
+                }
+                
+                currentPhone = data.deviceInfo?.phone || '';
+                runBtn.disabled = false;
+                
+                addResult('✅ WhatsApp terhubung!', 'success');
+            } else if (data.status === 'disconnected') {
+                connectionBadge.textContent = '📴 Offline';
+                connectionBadge.classList.remove('connected');
+                runBtn.disabled = true;
+                
+                addResult('❌ WhatsApp terputus', 'error');
+            }
+        });
+
+        socket.on('result', (data) => {
+            if (data.success) {
+                successCount++;
+                addResult(`✅ Loop ${data.loop}: ${data.result} (${data.time}ms)`, 'success');
+            } else {
+                failCount++;
+                addResult(`❌ Loop ${data.loop}: ${data.error}`, 'error');
+            }
+            updateStats();
+        });
+
+        socket.on('progress', (data) => {
+            if (data.status === 'completed') {
+                addResult('✅ Test selesai', 'success');
+            }
+        });
+
+        socket.on('console', (data) => {
+            addResult(`📢 Console: ${data.message}`, 'info');
+        });
+
+        socket.on('disconnect', () => {
+            addResult('🔌 Terputus dari server', 'error');
+        });
+
+        // Functions
+        function addResult(message, type) {
+            const item = document.createElement('div');
+            item.className = `result-item ${type}`;
+            item.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            results.insertBefore(item, results.firstChild);
+            
+            while (results.children.length > 50) {
+                results.removeChild(results.lastChild);
+            }
+        }
+
+        function updateStats() {
+            successSpan.textContent = successCount;
+            failedSpan.textContent = failCount;
+        }
+
+        function copyCode() {
+            const code = pairingCodeDisplay.textContent;
+            navigator.clipboard.writeText(code);
+            addResult('📋 Kode disalin', 'info');
+        }
+
+        async function requestPairing() {
+            const phone = document.getElementById('phoneNumber').value.trim();
+            
+            if (!phone) {
+                alert('Masukkan nomor');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/pairing', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Socket-ID': socketId
+                    },
+                    body: JSON.stringify({ phone })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    addResult(`📱 Pairing untuk ${phone}`, 'info');
+                } else {
+                    addResult(`❌ ${data.error}`, 'error');
+                }
+            } catch (err) {
+                addResult(`❌ ${err.message}`, 'error');
+            }
+        }
+
+        async function runTest() {
+            if (isRunning) {
+                addResult('⚠ Test sedang berjalan', 'error');
+                return;
+            }
+
+            const target = document.getElementById('targetNumber').value.trim();
+            const loop = parseInt(document.getElementById('loopCount').value);
+            const delay = parseInt(document.getElementById('delay').value);
+            const code = functionCode.innerText;
+
+            if (!target || !target.match(/^\d+$/)) {
+                alert('Nomor target tidak valid');
+                return;
+            }
+
+            if (!currentPhone) {
+                alert('WhatsApp belum terhubung');
+                return;
+            }
+
+            isRunning = true;
+            stopRequested = false;
+            successCount = 0;
+            failCount = 0;
+            updateStats();
+
+            addResult(`🚀 Test ke ${target} (${loop}x)`, 'info');
+
+            try {
+                const response = await fetch('/api/execute', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Socket-ID': socketId
+                    },
+                    body: JSON.stringify({
+                        phone: currentPhone,
+                        target,
+                        code,
+                        loop,
+                        delay
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (!data.success) {
+                    addResult(`❌ ${data.error}`, 'error');
+                }
+            } catch (err) {
+                addResult(`❌ ${err.message}`, 'error');
+            }
+
+            isRunning = false;
+        }
+
+        function stopTest() {
+            stopRequested = true;
+            addResult('⏹ Menghentikan test...', 'warning');
+        }
+
+        function clearResults() {
+            results.innerHTML = '';
+            successCount = 0;
+            failCount = 0;
+            updateStats();
+        }
+    </script>
+</body>
+</html>
